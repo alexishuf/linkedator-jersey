@@ -1,0 +1,53 @@
+Instrcutions:
+
+linkedator.config (Example)
+===============
+{
+   "label": "BanckOfAmerica",
+   "uriLinkedatorApi": "http://localhost:9091/linkedator-api",
+   "microserviceDescriptionFile": "bankOfAmerica.jsonld"
+}
+
+
+
+Jersey config (Example)
+=============
+public class JerseyConfig extends ResourceConfig {
+
+    public JerseyConfig() throws IOException {
+        ....
+        ....
+        
+        LinkedadorApi linkedadorApi = new LinkedadorApi();
+        linkedadorApi.registryMicroservice();
+    }
+}
+
+
+
+Example of a microservice description (bankOfAmerica.jsonld)
+=====================================
+{
+ "uriBase": "http://10.1.1.20/microservice",
+ "semanticResources": [
+  {
+   "entity": "http://ontology#BankAccount",
+   "properties": [
+	"http://ontology#registerNumber",
+	"http://ontology#date",
+	"http://ontology#crime",
+	"http://ontology#country",
+	"http://ontology#taxID"
+   ],
+   "uriTemplates": [
+    {
+     "method": "GET",
+     "uri": "bank-account/related-to/{x}",
+     "parameters": {
+      "x": "http://ontology#taxID"
+     }
+    }
+   ]
+  }
+ ]
+}
