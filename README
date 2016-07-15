@@ -4,6 +4,8 @@ linkedator.config (Example)
 ===============
 {
    "label": "BanckOfAmerica",
+   "serverPort": 8080,
+   "microserviceUriBase": "/microservice",
    "uriLinkedatorApi": "http://localhost:9091/linkedator-api",
    "microserviceDescriptionFile": "bankOfAmerica.jsonld"
 }
@@ -17,7 +19,7 @@ public class JerseyConfig extends ResourceConfig {
     public JerseyConfig() throws IOException {
         ....
         ....
-        
+        this.register(LinkedadorWriterInterceptor.class);
         LinkedadorApi linkedadorApi = new LinkedadorApi();
         linkedadorApi.registryMicroservice();
     }
@@ -28,7 +30,6 @@ public class JerseyConfig extends ResourceConfig {
 Example of a microservice description (bankOfAmerica.jsonld)
 =====================================
 {
- "uriBase": "http://10.1.1.20/microservice",
  "semanticResources": [
   {
    "entity": "http://ontology#BankAccount",

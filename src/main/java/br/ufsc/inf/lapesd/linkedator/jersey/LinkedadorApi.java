@@ -14,13 +14,19 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
+import br.ufsc.inf.lapesd.linkedator.SemanticMicroserviceDescription;
+
 public class LinkedadorApi {
-    
+
     public void registryMicroservice() throws IOException {
         String configFile = new String(Files.readAllBytes(Paths.get("linkedator.config")));
         LinkedatorConfig linkedatorConfig = new Gson().fromJson(configFile, LinkedatorConfig.class);
         System.out.println("Microservice: " + linkedatorConfig.getLabel());
-        String microserviceDescription = new String(Files.readAllBytes(Paths.get(linkedatorConfig.getMicroserviceDescriptionFile())));
+        String microserviceDescriptionJson = new String(Files.readAllBytes(Paths.get(linkedatorConfig.getMicroserviceDescriptionFile())));
+        SemanticMicroserviceDescription microserviceDescription = new Gson().fromJson(microserviceDescriptionJson, SemanticMicroserviceDescription.class);
+
+        microserviceDescription.setServerPort(String.valueOf(linkedatorConfig.getServerPort()));
+        microserviceDescription.setUriBase(linkedatorConfig.getMicroserviceUriBase());
 
         Client client = ClientBuilder.newClient();
         WebTarget webTarget = client.target(linkedatorConfig.getUriLinkedatorApi()).path("microservice/description");
@@ -28,7 +34,8 @@ public class LinkedadorApi {
         Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
 
         try {
-            Response response = invocationBuilder.post(Entity.entity(microserviceDescription, MediaType.APPLICATION_JSON));
+            String stringDescription = microserviceDescription.toString();
+            Response response = invocationBuilder.post(Entity.entity(stringDescription, MediaType.APPLICATION_JSON));
 
             int status = response.getStatus();
             if (status == 200) {
@@ -44,7 +51,7 @@ public class LinkedadorApi {
     public String createLinks(String representation) throws IOException {
         String configFile = new String(Files.readAllBytes(Paths.get("linkedator.config")));
         LinkedatorConfig linkedatorConfig = new Gson().fromJson(configFile, LinkedatorConfig.class);
-        
+
         String responseRepresentation = representation;
         Client client = ClientBuilder.newClient();
         WebTarget webTarget = client.target(linkedatorConfig.getUriLinkedatorApi()).path("createLinks");
