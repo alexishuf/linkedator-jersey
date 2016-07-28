@@ -7,6 +7,7 @@ public class LinkedatorConfig {
     private String microserviceDescriptionFile;
     private String microserviceUriBase;
     private int serverPort;
+    private boolean verifyLinks;
 
     public String getLabel() {
         return label;
@@ -46,6 +47,14 @@ public class LinkedatorConfig {
 
     public void setServerPort(int serverPort) {
         this.serverPort = serverPort;
+    }
+
+    public boolean isVerifyLinks() {
+        return verifyLinks;
+    }
+
+    public void setVerifyLinks(boolean verifyLinks) {
+        this.verifyLinks = verifyLinks;
     }
 
 }

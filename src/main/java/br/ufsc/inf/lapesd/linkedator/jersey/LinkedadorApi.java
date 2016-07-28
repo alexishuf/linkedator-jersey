@@ -40,6 +40,8 @@ public class LinkedadorApi {
             int status = response.getStatus();
             if (status == 200) {
                 System.out.println("Microservice registry successful");
+            } else if (status == 404) {
+                System.out.println("Microservice NOT registred - HTTP 404");
             }
         } catch (Exception e) {
             System.out.println("Microservice not registered");
@@ -54,7 +56,7 @@ public class LinkedadorApi {
 
         String responseRepresentation = representation;
         Client client = ClientBuilder.newClient();
-        WebTarget webTarget = client.target(linkedatorConfig.getUriLinkedatorApi()).path("createLinks");
+        WebTarget webTarget = client.target(linkedatorConfig.getUriLinkedatorApi()).path("createLinks").queryParam("verifyLinks", linkedatorConfig.isVerifyLinks());
 
         Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
 
