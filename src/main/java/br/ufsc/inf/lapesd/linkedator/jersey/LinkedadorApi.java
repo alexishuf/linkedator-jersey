@@ -21,6 +21,12 @@ public class LinkedadorApi {
     public void registryMicroservice() throws IOException {
         String configFile = new String(Files.readAllBytes(Paths.get("linkedator.config")));
         LinkedatorConfig linkedatorConfig = new Gson().fromJson(configFile, LinkedatorConfig.class);
+
+        if (!linkedatorConfig.isEnableLinkedator()) {
+            System.out.println("Microservice NOT registred - Likedator not enabled");
+            return;
+        }
+
         System.out.println("Microservice: " + linkedatorConfig.getLabel());
         String microserviceDescriptionJson = new String(Files.readAllBytes(Paths.get(linkedatorConfig.getMicroserviceDescriptionFile())));
         SemanticMicroserviceDescription microserviceDescription = new Gson().fromJson(microserviceDescriptionJson, SemanticMicroserviceDescription.class);
@@ -53,6 +59,10 @@ public class LinkedadorApi {
     public String createLinks(String representation) throws IOException {
         String configFile = new String(Files.readAllBytes(Paths.get("linkedator.config")));
         LinkedatorConfig linkedatorConfig = new Gson().fromJson(configFile, LinkedatorConfig.class);
+
+        if (!linkedatorConfig.isEnableLinkedator()) {
+            return representation;
+        }
 
         String responseRepresentation = representation;
         Client client = ClientBuilder.newClient();

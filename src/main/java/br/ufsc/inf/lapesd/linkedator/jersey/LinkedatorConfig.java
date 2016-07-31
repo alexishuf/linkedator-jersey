@@ -8,6 +8,7 @@ public class LinkedatorConfig {
     private String microserviceUriBase;
     private int serverPort;
     private boolean verifyLinks;
+    private boolean enableLinkedator;
 
     public String getLabel() {
         return label;
@@ -55,6 +56,14 @@ public class LinkedatorConfig {
 
     public void setVerifyLinks(boolean verifyLinks) {
         this.verifyLinks = verifyLinks;
+    }
+
+    public boolean isEnableLinkedator() {
+        return enableLinkedator;
+    }
+
+    public void setEnableLinkedator(boolean enableLinkedator) {
+        this.enableLinkedator = enableLinkedator;
     }
 
 }
