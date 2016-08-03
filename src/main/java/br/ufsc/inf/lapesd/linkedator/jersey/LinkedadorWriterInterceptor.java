@@ -38,31 +38,32 @@ public class LinkedadorWriterInterceptor implements WriterInterceptor, Container
             return;
         }
 
+        
         if (entity != null) {
             String representationWithLinks = linkedatorApi.createLinks(entity.toString());
 
             JsonElement parseRepresentation = timeStamp(time, representationWithLinks);
-            
+
             representationWithLinks = parseRepresentation.toString();
 
             context.setEntity(representationWithLinks);
         }
-        context.proceed();
+        context.proceed(); 
 
     }
 
     private JsonElement timeStamp(Stopwatch time, String representationWithLinks) {
         long elapsed = time.elapsed(TimeUnit.MICROSECONDS);
-        double processingTime = elapsed/1000.0;
-        
+        double processingTime = elapsed / 1000.0;
+
         JsonElement parseRepresentation = new JsonParser().parse(representationWithLinks);
-        if (parseRepresentation.isJsonObject()) {
-            parseRepresentation.getAsJsonObject().addProperty("linkedatorJerseyTime", processingTime);
-        } else if (parseRepresentation.isJsonArray()) {
+        if (parseRepresentation.isJsonArray()) {
             JsonObject timeObject = new JsonObject();
             timeObject.addProperty("linkedatorJerseyTime", processingTime);
             parseRepresentation.getAsJsonArray().add(timeObject);
-        }
+        } else {
+            parseRepresentation.getAsJsonObject().addProperty("linkedatorJerseyTime", processingTime);
+        } 
         return parseRepresentation;
     }
 
