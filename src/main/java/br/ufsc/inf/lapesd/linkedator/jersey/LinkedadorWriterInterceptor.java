@@ -41,16 +41,13 @@ public class LinkedadorWriterInterceptor implements WriterInterceptor, Container
         if (linkedatorOptions != null && linkedatorOptions.contains("linkVerify")) {
             return;
         }
-
         
         if (entity != null) {
             String representationWithLinks = linkedatorApi.createLinks(entity.toString());
-            
-            
+                        
             String configFile = new String(Files.readAllBytes(Paths.get("linkedator.config")));
             LinkedatorConfig linkedatorConfig = new Gson().fromJson(configFile, LinkedatorConfig.class);
             if (linkedatorConfig.isEnableLinkedator()) {
-                
                 JsonElement parseRepresentation = timeStamp(time, representationWithLinks);
                 context.setEntity(parseRepresentation.toString());
             }
