@@ -1,6 +1,8 @@
 package br.ufsc.inf.lapesd.linkedator.jersey;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -13,6 +15,7 @@ import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
 import com.google.common.base.Stopwatch;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -34,6 +37,7 @@ public class LinkedadorWriterInterceptor implements WriterInterceptor, Container
         Stopwatch time = Stopwatch.createStarted();
         Object entity = context.getEntity();
         List<String> linkedatorOptions = (List<String>) context.getProperty("linkedatorOptions");
+        
         if (linkedatorOptions != null && linkedatorOptions.contains("linkVerify")) {
             return;
         }
@@ -41,15 +45,20 @@ public class LinkedadorWriterInterceptor implements WriterInterceptor, Container
         
         if (entity != null) {
             String representationWithLinks = linkedatorApi.createLinks(entity.toString());
-
-            JsonElement parseRepresentation = timeStamp(time, representationWithLinks);
-
-            representationWithLinks = parseRepresentation.toString();
-
-            context.setEntity(representationWithLinks);
+            
+            
+            String configFile = new String(Files.readAllBytes(Paths.get("linkedator.config")));
+            LinkedatorConfig linkedatorConfig = new Gson().fromJson(configFile, LinkedatorConfig.class);
+            if (linkedatorConfig.isEnableLinkedator()) {
+                
+                JsonElement parseRepresentation = timeStamp(time, representationWithLinks);
+                context.setEntity(parseRepresentation.toString());
+            }
+            else{
+                context.setEntity(representationWithLinks);
+            }
         }
         context.proceed(); 
-
     }
 
     private JsonElement timeStamp(Stopwatch time, String representationWithLinks) {
