@@ -9,6 +9,7 @@ public class LinkedatorConfig {
     private int serverPort;
     private boolean verifyLinks;
     private boolean enableLinkedator;
+    private String ontologyFile;
 
     public String getLabel() {
         return label;
@@ -64,6 +65,14 @@ public class LinkedatorConfig {
 
     public void setEnableLinkedator(boolean enableLinkedator) {
         this.enableLinkedator = enableLinkedator;
+    }
+
+    public String getOntologyFile() {
+        return ontologyFile;
+    }
+
+    public void setOntologyFile(String ontologyFile) {
+        this.ontologyFile = ontologyFile;
     }
 
 }

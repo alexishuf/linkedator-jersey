@@ -3,6 +3,7 @@ package br.ufsc.inf.lapesd.linkedator.jersey;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -30,6 +31,10 @@ public class LinkedadorApi {
         System.out.println("Microservice: " + linkedatorConfig.getLabel());
         String microserviceDescriptionJson = new String(Files.readAllBytes(Paths.get(linkedatorConfig.getMicroserviceDescriptionFile())));
         SemanticMicroserviceDescription microserviceDescription = new Gson().fromJson(microserviceDescriptionJson, SemanticMicroserviceDescription.class);
+
+        String ontology = new String(Files.readAllBytes(Paths.get(linkedatorConfig.getOntologyFile())));
+        String ontologyBase64 = Base64.getEncoder().encodeToString(ontology.getBytes());
+        microserviceDescription.setOntologyBase64(ontologyBase64);
 
         microserviceDescription.setServerPort(String.valueOf(linkedatorConfig.getServerPort()));
         microserviceDescription.setUriBase(linkedatorConfig.getMicroserviceUriBase());

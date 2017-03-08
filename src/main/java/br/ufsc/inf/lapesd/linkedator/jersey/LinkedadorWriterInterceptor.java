@@ -37,25 +37,26 @@ public class LinkedadorWriterInterceptor implements WriterInterceptor, Container
         Stopwatch time = Stopwatch.createStarted();
         Object entity = context.getEntity();
         List<String> linkedatorOptions = (List<String>) context.getProperty("linkedatorOptions");
-        
+
         if (linkedatorOptions != null && linkedatorOptions.contains("linkVerify")) {
+            context.setEntity(entity);
+            context.proceed();
             return;
         }
-        
+
         if (entity != null) {
             String representationWithLinks = linkedatorApi.createLinks(entity.toString());
-                        
+
             String configFile = new String(Files.readAllBytes(Paths.get("linkedator.config")));
             LinkedatorConfig linkedatorConfig = new Gson().fromJson(configFile, LinkedatorConfig.class);
             if (linkedatorConfig.isEnableLinkedator()) {
                 JsonElement parseRepresentation = timeStamp(time, representationWithLinks);
                 context.setEntity(parseRepresentation.toString());
-            }
-            else{
+            } else {
                 context.setEntity(representationWithLinks);
             }
         }
-        context.proceed(); 
+        context.proceed();
     }
 
     private JsonElement timeStamp(Stopwatch time, String representationWithLinks) {
@@ -69,7 +70,7 @@ public class LinkedadorWriterInterceptor implements WriterInterceptor, Container
             parseRepresentation.getAsJsonArray().add(timeObject);
         } else {
             parseRepresentation.getAsJsonObject().addProperty("linkedatorJerseyTime", processingTime);
-        } 
+        }
         return parseRepresentation;
     }
 
