@@ -45,7 +45,7 @@ public class LinkedadorApi {
         Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
 
         try {
-            String stringDescription = microserviceDescription.toString();
+            String stringDescription = new Gson().toJson(microserviceDescription);
             Response response = invocationBuilder.post(Entity.entity(stringDescription, MediaType.APPLICATION_JSON));
 
             int status = response.getStatus();
