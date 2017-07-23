@@ -18,11 +18,34 @@ import com.google.gson.Gson;
 import br.ufsc.inf.lapesd.linkedator.SemanticMicroserviceDescription;
 
 public class LinkedadorApi {
+    private LinkedatorConfig linkedatorConfig;
+    private final ClientBuilder builder = ClientBuilder.newBuilder();
 
-    public void registryMicroservice() throws IOException {
+    public LinkedadorApi()  {
+        linkedatorConfig = new LinkedatorConfig();
+        linkedatorConfig.setEnableLinkedator(false);
+    }
+
+
+    public LinkedatorConfig getConfig() {
+        return linkedatorConfig;
+    }
+
+    public LinkedadorApi setConfig(LinkedatorConfig config) {
+        this.linkedatorConfig = config;
+        return this;
+    }
+
+    public LinkedadorApi loadConfig() throws IOException {
         String configFile = new String(Files.readAllBytes(Paths.get("linkedator.config")));
-        LinkedatorConfig linkedatorConfig = new Gson().fromJson(configFile, LinkedatorConfig.class);
+        return setConfig(new Gson().fromJson(configFile, LinkedatorConfig.class));
+    }
 
+    public ClientBuilder getClientBuilder() {
+        return builder;
+    }
+
+    public void registerMicroservice() throws IOException {
         if (!linkedatorConfig.isEnableLinkedator()) {
             System.out.println("Microservice NOT registred - Likedator not enabled");
             return;
@@ -61,32 +84,28 @@ public class LinkedadorApi {
 
     }
 
-    public String createLinks(String representation) throws IOException {
-        String configFile = new String(Files.readAllBytes(Paths.get("linkedator.config")));
-        LinkedatorConfig linkedatorConfig = new Gson().fromJson(configFile, LinkedatorConfig.class);
-
+    public Object createLinks(Object entity, MediaType mediaType) throws IOException {
         if (!linkedatorConfig.isEnableLinkedator()) {
-            return representation;
+            return entity;
         }
 
-        String responseRepresentation = representation;
-        Client client = ClientBuilder.newClient();
-        WebTarget webTarget = client.target(linkedatorConfig.getUriLinkedatorApi()).path("createLinks").queryParam("verifyLinks", linkedatorConfig.isVerifyLinks());
-
-        Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
+        Client client = getClientBuilder().build();
+        Invocation.Builder builder = client.target(linkedatorConfig.getUriLinkedatorApi())
+                .path("createLinks")
+                .queryParam("verifyLinks", linkedatorConfig.isVerifyLinks())
+                .request(mediaType);
 
         try {
-            Response response = invocationBuilder.post(Entity.entity(representation, MediaType.APPLICATION_JSON));
+            Response response = builder.post(Entity.entity(entity,mediaType));
 
             int status = response.getStatus();
-            if (status == 200) {
-                responseRepresentation = response.readEntity(String.class);
-            }
+            if (status == 200)
+                entity = response.readEntity(entity.getClass());
         } catch (Exception e) {
-            responseRepresentation = representation;
+            e.printStackTrace();
         }
 
-        return responseRepresentation;
+        return entity;
     }
 
 }
